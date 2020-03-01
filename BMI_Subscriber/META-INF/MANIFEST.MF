@@ -6,6 +6,8 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: bmi_subscriber.Activator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: com.mtit.osgi.bmi_subscriber
-Import-Package: bmi_publisher,
+Import-Package: bmi_height_converter,
+ bmi_publisher,
+ bmi_weight_converter,
  org.osgi.framework;version="1.3.0"
 Bundle-ActivationPolicy: lazy

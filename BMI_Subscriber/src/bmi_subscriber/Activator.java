@@ -1,6 +1,7 @@
 package bmi_subscriber;
 
 import bmi_publisher.BmiPublishService;
+import bmi_weight_converter.WeightService;
 import model.BMI;
 
 import java.util.Scanner;
@@ -9,20 +10,31 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
+import bmi_height_converter.HeightService;
+
 public class Activator implements BundleActivator {
 
-	ServiceReference serviceReference; 
+	ServiceReference serviceReference1; 
+	ServiceReference serviceReference2; 
+	ServiceReference serviceReference3; 
 	
 	/*
 	 * (non-Javadoc)
 	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext context) throws Exception {
-		System.out.println("Subscriber => start");
+		System.out.println("BMISubscriber => start");
 		Scanner scanner = new Scanner(System.in);
 		
-		serviceReference = context.getServiceReference(BmiPublishService.class.getName());
-		BmiPublishService bmiPublishService = (BmiPublishService) context.getService(serviceReference);
+		serviceReference1 = context.getServiceReference(BmiPublishService.class.getName());
+		BmiPublishService bmiPublishService = (BmiPublishService) context.getService(serviceReference1);
+		
+		serviceReference2 = context.getServiceReference(HeightService.class.getName());
+		HeightService heightService = (HeightService) context.getService(serviceReference2);
+		
+		serviceReference3 = context.getServiceReference(WeightService.class.getName());
+		WeightService weightService = (WeightService) context.getService(serviceReference3);
+		
 		String continueX = "";
 		
 		do {
@@ -35,13 +47,8 @@ public class Activator implements BundleActivator {
 			double weight = scanner.nextDouble();
 			bmi.setWeight(weight);
 			
-			double weightInKG = bmiPublishService.standardizedWeight(bmi.getWeight(), bmi.getWeightUnit());
+			double weightInKG = weightService.standardizedWeight(bmi.getWeight(), bmi.getWeightUnit());
 			if(weightInKG == -1) {
-				System.out.println("Invalid unit in weight");
-				break;
-			}
-			else if(weightInKG == -2) {
-				System.out.println("Invalid value in weight");
 				break;
 			}
 			bmi.setWeightInKG(weightInKG);
@@ -53,7 +60,7 @@ public class Activator implements BundleActivator {
 			double height = scanner.nextDouble();
 			bmi.setHeight(height);
 			
-			double heightInM = bmiPublishService.standardizedHeight(bmi.getHeight(), bmi.getHeightUnit());
+			double heightInM = heightService.standardizedHeight(bmi.getHeight(), bmi.getHeightUnit());
 			if(heightInM == -1) {
 				System.out.println("Invalid value in length");
 				break;
@@ -79,8 +86,10 @@ public class Activator implements BundleActivator {
 	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-		System.out.println("Subscriber => stop");
-		context.ungetService(serviceReference);
+		System.out.println("BMI Subscriber => stop");
+		context.ungetService(serviceReference1);
+		context.ungetService(serviceReference2);
+		context.ungetService(serviceReference3);
 	}
 
 }
